@@ -1,0 +1,51 @@
+Maladie,Règle,DAS,Couverture
+Bronchial Asthma,IF breathlessness THEN Bronchial Asthma,[' breathlessness'],0.95
+Bronchial Asthma,IF family_history THEN Bronchial Asthma,[' family_history'],0.95
+Bronchial Asthma,IF high_fever THEN Bronchial Asthma,[' high_fever'],0.95
+Bronchial Asthma,IF mucoid_sputum THEN Bronchial Asthma,[' mucoid_sputum'],0.95
+Bronchial Asthma,IF cough THEN Bronchial Asthma,[' cough'],0.9
+Bronchial Asthma,IF fatigue THEN Bronchial Asthma,[' fatigue'],0.9
+Common Cold,IF chest_pain THEN Common Cold,[' chest_pain'],1.0
+Common Cold,IF congestion THEN Common Cold,[' congestion'],1.0
+Common Cold,IF loss_of_smell THEN Common Cold,[' loss_of_smell'],1.0
+Common Cold,IF muscle_pain THEN Common Cold,[' muscle_pain'],1.0
+Common Cold,IF phlegm THEN Common Cold,[' phlegm'],1.0
+Common Cold,IF redness_of_eyes THEN Common Cold,[' redness_of_eyes'],1.0
+Common Cold,IF runny_nose THEN Common Cold,[' runny_nose'],1.0
+Common Cold,IF sinus_pressure THEN Common Cold,[' sinus_pressure'],1.0
+Common Cold,IF throat_irritation THEN Common Cold,[' throat_irritation'],1.0
+Common Cold,IF chills THEN Common Cold,[' chills'],0.95
+Common Cold,IF continuous_sneezing THEN Common Cold,[' continuous_sneezing'],0.95
+Common Cold,IF cough THEN Common Cold,[' cough'],0.95
+Common Cold,IF fatigue THEN Common Cold,[' fatigue'],0.95
+Common Cold,IF headache THEN Common Cold,[' headache'],0.95
+Common Cold,IF high_fever THEN Common Cold,[' high_fever'],0.95
+Common Cold,IF malaise THEN Common Cold,[' malaise'],0.95
+Common Cold,IF swelled_lymph_nodes THEN Common Cold,[' swelled_lymph_nodes'],0.95
+Pneumonia,IF chest_pain THEN Pneumonia,[' chest_pain'],1.0
+Pneumonia,IF fast_heart_rate THEN Pneumonia,[' fast_heart_rate'],1.0
+Pneumonia,IF rusty_sputum THEN Pneumonia,[' rusty_sputum'],1.0
+Pneumonia,IF breathlessness THEN Pneumonia,[' breathlessness'],0.95
+Pneumonia,IF chills THEN Pneumonia,[' chills'],0.95
+Pneumonia,IF cough THEN Pneumonia,[' cough'],0.95
+Pneumonia,IF fatigue THEN Pneumonia,[' fatigue'],0.95
+Pneumonia,IF high_fever THEN Pneumonia,[' high_fever'],0.95
+Pneumonia,IF malaise THEN Pneumonia,[' malaise'],0.95
+Pneumonia,IF phlegm THEN Pneumonia,[' phlegm'],0.95
+Pneumonia,IF sweating THEN Pneumonia,[' sweating'],0.95
+Tuberculosis,IF blood_in_sputum THEN Tuberculosis,[' blood_in_sputum'],1.0
+Tuberculosis,IF chest_pain THEN Tuberculosis,[' chest_pain'],1.0
+Tuberculosis,IF loss_of_appetite THEN Tuberculosis,[' loss_of_appetite'],1.0
+Tuberculosis,IF malaise THEN Tuberculosis,[' malaise'],1.0
+Tuberculosis,IF mild_fever THEN Tuberculosis,[' mild_fever'],1.0
+Tuberculosis,IF phlegm THEN Tuberculosis,[' phlegm'],1.0
+Tuberculosis,IF swelled_lymph_nodes THEN Tuberculosis,[' swelled_lymph_nodes'],1.0
+Tuberculosis,IF yellowing_of_eyes THEN Tuberculosis,[' yellowing_of_eyes'],1.0
+Tuberculosis,IF breathlessness THEN Tuberculosis,[' breathlessness'],0.95
+Tuberculosis,IF chills THEN Tuberculosis,[' chills'],0.95
+Tuberculosis,IF cough THEN Tuberculosis,[' cough'],0.95
+Tuberculosis,IF fatigue THEN Tuberculosis,[' fatigue'],0.95
+Tuberculosis,IF high_fever THEN Tuberculosis,[' high_fever'],0.95
+Tuberculosis,IF sweating THEN Tuberculosis,[' sweating'],0.95
+Tuberculosis,IF vomiting THEN Tuberculosis,[' vomiting'],0.95
+Tuberculosis,IF weight_loss THEN Tuberculosis,[' weight_loss'],0.95
