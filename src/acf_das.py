@@ -116,3 +116,66 @@ class FormalContext:
         self.concepts = all_concepts
         print(f"{len(self.concepts)} concepts formels extraits")
         return self.concepts
+    def reduce_concepts(self):
+        """
+        Étape 3 — Nettoyage des concepts formels (Algorithme 3 du PFE).
+        
+        """
+        if not self.concepts:
+            raise ValueError("Lance d'abord extract_concepts()")
+        print("\nÉtape 3 — Nettoyage des concepts formels...")
+        print(f"   Concepts avant nettoyage : {len(self.concepts)}")
+
+        # Chaque concept = (extension, intension)
+        # On décompose l'intension en (maladie, symptôme)
+        def get_diseases(intension):
+            """Extraire les maladies de l'intension."""
+            diseases = set()
+            for col in intension:
+                for disease in self.diseases:
+                    if col.startswith(f"{disease}_"):
+                        diseases.add(disease)
+            return frozenset(diseases)
+
+        def get_symptoms(intension):
+            """Extraire les symptômes (conditions) de l'intension."""
+            symptoms = set()
+            for col in intension:
+                for disease in self.diseases:
+                    if col.startswith(f"{disease}_"):
+                        symptoms.add(col.replace(f"{disease}_", "").strip())
+            return frozenset(symptoms)
+
+        # Algorithme 3 — clean_concepts
+        d = {}
+        for i, concept_i in enumerate(self.concepts):
+            d[i] = concept_i
+
+        for i, concept_i in enumerate(self.concepts):
+            if i not in d:
+                continue
+            ext_i = concept_i[0]  # Extension
+            int_i = get_diseases(concept_i[1])  # Intension (maladies)
+            cond_i = get_symptoms(concept_i[1])  # Condition (symptômes)
+
+            for j, concept_j in enumerate(self.concepts):
+                if i == j or j not in d:
+                    continue
+                ext_j = concept_j[0]
+                int_j = get_diseases(concept_j[1])
+                cond_j = get_symptoms(concept_j[1])
+
+                # Les 3 conditions de l'Algorithme 3
+                same_intension = int_i == int_j
+                ext_j_subset_of_i = ext_j.issubset(ext_i)
+                cond_j_superset_of_i = cond_j.issuperset(cond_i)
+
+                if same_intension and ext_j_subset_of_i and cond_j_superset_of_i:
+                    if j in d:
+                        del d[j]
+
+        reduced = list(d.values())
+        self.concepts = reduced
+        print(f"   Concepts après nettoyage : {len(self.concepts)}")
+        print(f" Nettoyage terminé")
+        return self.concepts
