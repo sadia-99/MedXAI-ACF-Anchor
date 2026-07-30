@@ -1,112 +1,87 @@
 import pandas as pd
 import numpy as np
-from itertools import combinations
 
 
 class FormalContext:
     """
-    Analyse de Concepts Formels (ACF) pour le calcul des
-    Ensembles Décisifs d'Attributs (DAS) — basé sur le PFE UMMTO 2022.
+    Étape 1 — Transformation des données multi-label en contexte formel.
+    
+    Données 3D (Patient × Symptôme × Maladie)
+    → Contexte formel 2D KOMR (Patient × (Maladie-Symptôme))
+    
+    Règle : KOMR[patient][maladie_symptôme] = 1
+            si patient a le symptôme ET est diagnostiqué avec la maladie
     """
 
     def __init__(self, df, disease_col="Disease"):
-        """
-        df          : DataFrame avec colonnes Symptom_1..Symptom_17 + Disease
-        disease_col : nom de la colonne cible
-        """
         self.df = df.copy()
         self.disease_col = disease_col
-        self.binary_matrix = None
+        self.KOMR = None
         self.symptoms = None
         self.diseases = None
 
     def build_context(self):
         """
-        Transforme le dataset en matrice binaire (contexte formel).
-        Ligne = patient, Colonne = symptôme, Valeur = 0 ou 1.
+        Construit la matrice KOMR (Patient × Maladie-Symptôme).
         """
-        print("Construction du contexte formel...")
+        print("Étape 1 — Transformation multi-label → contexte formel...")
 
-        # Récupérer toutes les colonnes symptômes
+        # Récupérer les colonnes symptômes
         symptom_cols = [c for c in self.df.columns if c.startswith("Symptom_")]
 
         # Extraire tous les symptômes uniques
         all_symptoms = set()
         for col in symptom_cols:
             all_symptoms.update(self.df[col].dropna().unique())
-        self.symptoms = sorted(list(all_symptoms))
-
-        # Construire la matrice binaire
-        rows = []
-        for _, row in self.df.iterrows():
-            patient_symptoms = set(row[symptom_cols].dropna().values)
-            binary_row = [1 if s in patient_symptoms else 0
-                          for s in self.symptoms]
-            rows.append(binary_row)
-
-        self.binary_matrix = pd.DataFrame(
-            rows,
-            columns=self.symptoms
-        )
-        self.binary_matrix[self.disease_col] = self.df[self.disease_col].values
+        self.symptoms = sorted([s.strip() for s in all_symptoms])
         self.diseases = self.df[self.disease_col].unique().tolist()
 
-        print(f"Contexte formel construit :")
-        print(f"   {len(self.binary_matrix)} patients")
-        print(f"   {len(self.symptoms)} symptômes uniques")
+        # Matrice intermédiaire Patient × Symptôme
+        patient_symptom = pd.DataFrame(0,
+            index=range(len(self.df)),
+            columns=self.symptoms)
+
+        for idx, row in self.df.iterrows():
+            patient_syms = set(
+                s.strip() for s in row[symptom_cols].dropna().values
+            )
+            for s in patient_syms:
+                if s in self.symptoms:
+                    patient_symptom.loc[idx, s] = 1
+
+        # Matrice intermédiaire Patient × Maladie
+        patient_disease = pd.DataFrame(0,
+            index=range(len(self.df)),
+            columns=self.diseases)
+
+        for idx, row in self.df.iterrows():
+            patient_disease.loc[idx, row[self.disease_col]] = 1
+
+        # Construction de KOMR — Patient × (Maladie_Symptôme)
+        komr_cols = []
+        for disease in self.diseases:
+            for symptom in self.symptoms:
+                komr_cols.append(f"{disease}_{symptom}")
+
+        self.KOMR = pd.DataFrame(0,
+            index=range(len(self.df)),
+            columns=komr_cols)
+
+        # Remplissage : 1 si patient a symptôme ET maladie
+        for idx in range(len(self.df)):
+            for disease in self.diseases:
+                if patient_disease.loc[idx, disease] == 1:
+                    for symptom in self.symptoms:
+                        if patient_symptom.loc[idx, symptom] == 1:
+                            col = f"{disease}_{symptom}"
+                            self.KOMR.loc[idx, col] = 1
+
+        print(f"Contexte formel KOMR construit :")
+        print(f"   {len(self.KOMR)} patients (lignes)")
         print(f"   {len(self.diseases)} maladies")
+        print(f"   {len(self.symptoms)} symptômes")
+        print(f"   {len(komr_cols)} colonnes (Maladie_Symptôme)")
+        print(f"\nAperçu KOMR (5 premières colonnes) :")
+        print(self.KOMR.iloc[:5, :5])
 
-        return self.binary_matrix
-
-    def compute_das(self, disease):
-        """
-        Calcule les Ensembles Décisifs d'Attributs (DAS) pour une maladie.
-        Retourne les sous-ensembles minimaux de symptômes qui caractérisent
-        uniquement cette maladie.
-        """
-        if self.binary_matrix is None:
-            raise ValueError("Lance d'abord build_context()")
-
-        print(f"\nCalcul des DAS pour : {disease}")
-
-        # Patients de la maladie cible
-        target = self.binary_matrix[
-            self.binary_matrix[self.disease_col] == disease
-        ].drop(columns=[self.disease_col])
-
-        # Patients des autres maladies
-        others = self.binary_matrix[
-            self.binary_matrix[self.disease_col] != disease
-        ].drop(columns=[self.disease_col])
-
-        # Symptômes présents chez AU MOINS UN patient de la maladie
-        relevant_symptoms = [s for s in self.symptoms
-                             if target[s].sum() > 0]
-
-        das_list = []
-
-        # Chercher les sous-ensembles minimaux (du plus petit au plus grand)
-        for size in range(1, len(relevant_symptoms) + 1):
-            for combo in combinations(relevant_symptoms, size):
-                combo = list(combo)
-
-                # Vérifier que ce combo couvre au moins 1 patient cible
-                covers_target = (target[combo].sum(axis=1) == len(combo)).any()
-                if not covers_target:
-                    continue
-
-                # Vérifier que ce combo n'est PAS redondant avec un DAS déjà trouvé
-                is_superset = any(
-                    set(das).issubset(set(combo)) for das in das_list
-                )
-                if is_superset:
-                    continue
-
-                das_list.append(combo)
-
-            # Arrêter si on a trouvé des DAS à cette taille
-            if das_list and size >= 2:
-                break
-
-        print(f"{len(das_list)} DAS trouvés pour {disease}")
-        return das_list
+        return self.KOMR
