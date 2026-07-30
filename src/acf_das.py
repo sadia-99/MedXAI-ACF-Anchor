@@ -179,3 +179,66 @@ class FormalContext:
         print(f"   Concepts après nettoyage : {len(self.concepts)}")
         print(f" Nettoyage terminé")
         return self.concepts
+    def compute_das(self, disease):
+        """
+        Étape 4 — Calcul des DAS (Algorithme 4 du PFE).
+  
+        """
+        if not self.concepts:
+            raise ValueError("Lance d'abord reduce_concepts()")
+
+        # Extraire les symptômes d'un concept pour cette maladie
+        def get_cond(intension):
+            symptoms = []
+            for col in intension:
+                if col.startswith(f"{disease}_"):
+                    symptoms.append(col.replace(f"{disease}_", "").strip())
+            return sorted(symptoms)
+
+        # B(ck) = concepts ayant la maladie dans leur intension
+        B_ck = []
+        for ext, inten in self.concepts:
+            cond = get_cond(inten)
+            if cond:
+                B_ck.append((ext, inten, cond))
+
+        if not B_ck:
+            return []
+
+        # Cas 1 : un seul concept
+        if len(B_ck) == 1:
+            das_list = [B_ck[0][2]]
+            return das_list
+
+        # Cas 2 : plusieurs concepts
+        # Diff(ck) = union des extensions ∩ intersection des extensions
+        all_extensions = [concept[0] for concept in B_ck]
+        union_ext = set().union(*all_extensions)
+        inter_ext = all_extensions[0].intersection(*all_extensions[1:])
+        diff_ck = union_ext - inter_ext
+
+        # Pour chaque x dans Diff(ck)
+        das_list = []
+        for x in diff_ck:
+            # Concepts qui contiennent x dans leur extension
+            concepts_with_x = [c for c in B_ck if x in c[0]]
+            if not concepts_with_x:
+                continue
+            # Dasx = union des Cond des concepts contenant x
+            dasx_symptoms = set()
+            for _, _, cond in concepts_with_x:
+                dasx_symptoms.update(cond)
+            dasx = sorted(dasx_symptoms)
+            if dasx and dasx not in das_list:
+                das_list.append(dasx)
+
+        # Supprimer les redondances
+        unique_das = []
+        seen = set()
+        for das in das_list:
+            key = frozenset(das)
+            if key not in seen:
+                seen.add(key)
+                unique_das.append(das)
+
+        return unique_das
