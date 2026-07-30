@@ -1,0 +1,10 @@
+Maladie,Règle,DAS,Couverture
+Bronchial Asthma,IF breathlessness AND cough AND family_history AND high_fever AND mucoid_sputum THEN Bronchial Asthma,"['breathlessness', 'cough', 'family_history', 'high_fever', 'mucoid_sputum']",0.7
+Bronchial Asthma,IF breathlessness AND family_history AND fatigue AND high_fever AND mucoid_sputum THEN Bronchial Asthma,"['breathlessness', 'family_history', 'fatigue', 'high_fever', 'mucoid_sputum']",0.7
+Bronchial Asthma,IF breathlessness AND cough AND family_history AND fatigue AND mucoid_sputum THEN Bronchial Asthma,"['breathlessness', 'cough', 'family_history', 'fatigue', 'mucoid_sputum']",0.65
+Bronchial Asthma,IF cough AND family_history AND fatigue AND high_fever AND mucoid_sputum THEN Bronchial Asthma,"['cough', 'family_history', 'fatigue', 'high_fever', 'mucoid_sputum']",0.65
+Bronchial Asthma,IF breathlessness AND cough AND fatigue AND high_fever AND mucoid_sputum THEN Bronchial Asthma,"['breathlessness', 'cough', 'fatigue', 'high_fever', 'mucoid_sputum']",0.65
+Bronchial Asthma,IF breathlessness AND cough AND family_history AND fatigue AND high_fever THEN Bronchial Asthma,"['breathlessness', 'cough', 'family_history', 'fatigue', 'high_fever']",0.65
+Common Cold,IF chest_pain AND congestion AND loss_of_smell AND muscle_pain AND phlegm AND redness_of_eyes AND runny_nose AND sinus_pressure AND throat_irritation THEN Common Cold,"['chest_pain', 'congestion', 'loss_of_smell', 'muscle_pain', 'phlegm', 'redness_of_eyes', 'runny_nose', 'sinus_pressure', 'throat_irritation']",1.0
+Pneumonia,IF chest_pain AND fast_heart_rate AND rusty_sputum THEN Pneumonia,"['chest_pain', 'fast_heart_rate', 'rusty_sputum']",1.0
+Tuberculosis,IF blood_in_sputum AND chest_pain AND loss_of_appetite AND malaise AND mild_fever AND phlegm AND swelled_lymph_nodes AND yellowing_of_eyes THEN Tuberculosis,"['blood_in_sputum', 'chest_pain', 'loss_of_appetite', 'malaise', 'mild_fever', 'phlegm', 'swelled_lymph_nodes', 'yellowing_of_eyes']",1.0
